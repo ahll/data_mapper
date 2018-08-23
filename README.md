@@ -6,7 +6,7 @@
 
 ## Usage
 
-@Test
+	@Test
     public void testMapping() {
         Value from = new Value();
         from.integerValue = 1;
