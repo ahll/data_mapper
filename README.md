@@ -4,8 +4,37 @@
 
 [why]: ./data_mapper.png
 
-Divide and rule for complex attributes, and clone all same attribute. 
+## Usage
 
+@Test
+    public void testMapping() {
+        Value from = new Value();
+        from.integerValue = 1;
+        from.textValue = "test value";
+        assertThat(mapper.apply(from)).isEqualTo(from);
+    }
+
+    @Test
+    public void testComplexMapping() {
+	
+        Value from = new Value();
+        from.integerValue = 1;
+        from.textValue = "test value";
+
+        mapper.addChildRuleByName("integerValue",
+                new AssemblerBuilder<Integer, Integer, Value, Value>()
+                        .childMapper(v -> v)
+                        .emptyIfError(0)
+                        .fromValueGetter(value -> value.integerValue)
+                        .toValueSetter((value, integer) -> {
+                            value.setIntegerValue(integer * 2);
+                        })
+                        .build()
+        );
+
+        assertThat(mapper.apply(from)).isNotEqualTo(from);
+        assertThat(mapper.apply(from).getIntegerValue()).isEqualTo(from.getIntegerValue() * 2);
+    }
 
 ## Getting Started
 
@@ -57,4 +86,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-Copyright (c) 2018, stico and/or its affiliates. All rights reserved.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
